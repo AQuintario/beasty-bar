@@ -10,7 +10,7 @@ import random
 random.seed(123)
 
 ######### GAME PARAMETERS #########
-num_cards_in_hand = 5
+num_cards_in_hand = 4
 num_cards_in_queue = 5
 Queue = []
 Bar = []
