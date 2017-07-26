@@ -6,8 +6,18 @@ Created on Fri Jul 21 21:00:41 2017
 @author: adrian
 """
 
+import src.Game
+import src.Card
+import src.Table
+
 import random
 random.seed(123)
+
+class Card:
+    def __init__(self, color_, id_):
+        self.color = color_
+        self.id = id_
+
 
 ######### GAME PARAMETERS #########
 num_cards_in_hand = 4
