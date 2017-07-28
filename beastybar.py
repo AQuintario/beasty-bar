@@ -15,21 +15,23 @@ random.seed(123)
 
 ######### GAME PARAMETERS #########
 num_cards_in_hand = 4
-num_cards_in_queue = 5
 
 
 class Table(object):
     queue = []
     bar = []
     alley = []
+    max_num_cards_in_queue = 5
+
+    def resolve_queue(self):
+        if len(self.queue) == 5:
+            self.alley.append(self.queue.pop())
+            self.bar.append(self.queue.pop(0))
+            self.bar.append(self.queue.pop(0))
 
 table = Table()
 
 ######### GAME PARAMETERS #########
-
-
-
-
 
 
 ######### SETTING THINGS UP #########
@@ -82,7 +84,6 @@ while len(hand_blue)+len(deck_blue) and len(hand_green)+len(deck_green):
         table.queue.append(chosen_card_from_hand)
         # Printouts
         print("Phase 3")
-        # print("Hand:", hand[color])
         print("queue", table.queue)
         # End phase 3
         
@@ -99,11 +100,7 @@ while len(hand_blue)+len(deck_blue) and len(hand_green)+len(deck_green):
         print("queue", table.queue)
 
         # Phase 6: resolve queue
-        if len(table.queue) == 5:
-            table.alley.append(table.queue.pop())
-            table.bar.append(table.queue.pop(0))
-            table.bar.append(table.queue.pop(0))
-        
+        table.resolve_queue()
         # Printouts
         print("Phase 6")
         print("queue", table.queue)
@@ -113,7 +110,18 @@ while len(hand_blue)+len(deck_blue) and len(hand_green)+len(deck_green):
             hand[color].append(deck[color].pop())
         # Printouts
 
-        
         print("")
 
-print("Bar:", table.bar)
+print("Bar:", table.bar, "\n")
+blue_points, green_points = 0, 0
+for c in table.bar:
+    if c.color == "Green":
+        green_points += 1
+    if c.color == "Blue":
+        blue_points += 1
+if green_points == blue_points:
+    print("Draw")
+elif green_points > blue_points:
+    print("Green player wins!")
+else:
+    print("Blue player wins!")

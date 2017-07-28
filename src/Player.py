@@ -1,9 +1,10 @@
 import random
-import src.Card
+from src.Card import Card
 
 
 class Player(Game):
     cards_all_players = 0
+    num_cards_in_hand = 4
 
     def __init__(self, color, is_human = False):
         self.color = color
@@ -11,22 +12,11 @@ class Player(Game):
         self.hand = []
         self.is_human = is_human
         self.populate_deck()
-        cards_all_players = len(self.deck)
+        Player.cards_all_players += len(self.deck)
 
     def populate_deck(self):
-        self.deck.append(Skunk(self.color))
-        self.deck.append(Parrot(self.color))
-        self.deck.append(Kangaroo(self.color))
-        self.deck.append(Monkey(self.color))
-        self.deck.append(Chameleon(self.color))
-        self.deck.append(Seal(self.color))
-        self.deck.append(Zebra(self.color))
-        self.deck.append(Giraffe(self.color))
-        self.deck.append(Snake(self.color))
-        self.deck.append(Crocodile(self.color))
-        self.deck.append(Hippo(self.color))
-        self.deck.append(Lion(self.color))
-        return
+        for i in range(1, 13, 1):
+            self.deck.append(Card(i, self.color))
 
     def shuffle_deck(self):
         random.shuffle(self.deck)
@@ -34,7 +24,7 @@ class Player(Game):
 
     def initial_draw(self):
         # Throw exception if len(hand)
-        for _ in Game.num_cards_in_hand:
+        for _ in Player.num_cards_in_hand:
             self.draw_card()
         return
 

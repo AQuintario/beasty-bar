@@ -73,9 +73,13 @@ def instant_actions(table, chosen_card_from_hand, target_card=None):
         if target_card is None:
             return
         print("Chameleon acts as", target_card)
+        # Let's try some cheap trick
+        true_color = chosen_card_from_hand.color
         chosen_card_from_hand.id = target_card.id
-        instant_actions(table, target_card)
+        chosen_card_from_hand.color = "Grey"
+        instant_actions(table, chosen_card_from_hand)
         chosen_card_from_hand.id = 5
+        chosen_card_from_hand.color = true_color
         return
     elif id == 6:
         table.queue.reverse()
