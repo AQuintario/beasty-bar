@@ -6,7 +6,7 @@ Created on Fri Jul 21 21:00:41 2017
 @author: adrian
 """
 
-from src.instant_actions import instant_actions
+from src.instant_actions import instant_actions, recurrent_actions
 from src.Player import Player
 from src.Table import Table
 
@@ -51,9 +51,7 @@ while Player.cards_all_players:
         print("queue", table.queue)
 
         # Phase 5: recurrent abilities (starting for the nearest to the bar)
-        for c in table.queue[:]:  # Make a copy of the queue before shaking it
-            if c.is_recurrent and c != chosen_card_from_hand:
-                instant_actions(table, c)
+        recurrent_actions(table, chosen_card_from_hand)
         print("Phase 5")
         print("queue", table.queue)
 

@@ -27,6 +27,12 @@ def get_n_highest_except_self(lst, n, self_id):
     return l
 
 
+def recurrent_actions(table, chosen_card_from_hand):
+    for c in table.queue[:]:  # Make a copy of the queue before shaking it
+        if c.is_recurrent and c != chosen_card_from_hand:
+            instant_actions(table, c)
+
+
 def instant_actions(table, chosen_card_from_hand, target_card=None):
     id = chosen_card_from_hand.id
     if id == 1:
