@@ -8,6 +8,7 @@ Created on Fri Jul 21 21:00:41 2017
 
 from src.instant_actions import instant_actions
 from src.Card import Card
+from src.Player import Player
 
 import random
 random.seed(123)
@@ -35,50 +36,54 @@ table = Table()
 
 
 ######### SETTING THINGS UP #########
-deck_blue = []
-deck_green = []
-for i in range(1, 13, 1):
-    color = "Blue"
-    deck_blue.append(Card(i, color))
-    color = "Green"
-    deck_green.append(Card(i, color))
+players = []
+players.append(Player("Blue"))
 
-hand_blue = []
-hand_green = []
-
-random.shuffle(deck_blue)
-random.shuffle(deck_green)
-
-for i in range(num_cards_in_hand):
-    hand_blue.append(deck_blue.pop())
-    hand_green.append(deck_green.pop())
-
+# Old style:
+# deck_blue = []
+# deck_green = []
+# player_blue.populate_deck()
+# for i in range(1, 13, 1):
+#     color = "Blue"
+#     deck_blue.append(Card(i, color))
+    # color = "Green"
+    # deck_green.append(Card(i, color))
+# hand_blue = []
+# hand_green = []
+# random.shuffle(deck_blue)
+# random.shuffle(deck_green)
+# for i in range(num_cards_in_hand):
+    # hand_blue.append(deck_blue.pop())
+    # hand_green.append(deck_green.pop())
+# hand = {"blue": hand_blue, "green": hand_green}
+# deck = {"blue": deck_blue, "green": deck_green}
 ######### SETTING THINGS UP #########
 
 
-hand = {"blue": hand_blue, "green": hand_green}
-deck = {"blue": deck_blue, "green": deck_green}
-
 turn_counter = 1
-while len(hand_blue)+len(deck_blue) and len(hand_green)+len(deck_green):
+# while len(hand_blue)+len(deck_blue) and len(hand_green)+len(deck_green):
+while Player.cards_all_players:
     print("Turn", turn_counter)
     turn_counter += 1
 
-    for color in "blue", "green":
-    
+    # for color in "blue", "green":
+    for player in players:
         # Phase 1: choose card from hand
-        chosen_card_from_hand = random.choice(hand[color])  # Distant future: not random
-        hand[color].remove(chosen_card_from_hand)
+        # chosen_card_from_hand = random.choice(hand[color])  # Distant future: not random
+        # hand[color].remove(chosen_card_from_hand)
         # Printouts
+        chosen_card_from_hand = player.choose_card()
         print("Phases 1, 2")
-        print("Hand:", hand[color], "Card chosen:", chosen_card_from_hand)
+        print("Hand:", player.hand, "Card chosen:", chosen_card_from_hand,
+              Player.cards_all_players, "total cards, left")
         print("queue", table.queue)
         # End phase 1
         
-        # Phase 2: choose card from queue
-        chosen_target = None
-        if len(table.queue) and chosen_card_from_hand.id == 2 or chosen_card_from_hand.id == 5:
-            chosen_target = random.choice(table.queue)
+        # # Phase 2: choose card from queue
+        # chosen_target = None
+        # if len(table.queue) and chosen_card_from_hand.id == 2 or chosen_card_from_hand.id == 5:
+        #     chosen_target = random.choice(table.queue)
+        chosen_target = player.choose_card_from_queue(table)
 
         # Phase 3: place selected card in queue
         table.queue.append(chosen_card_from_hand)
@@ -106,9 +111,9 @@ while len(hand_blue)+len(deck_blue) and len(hand_green)+len(deck_green):
         print("queue", table.queue)
 
         # Phase 7: draw a card from deck
-        if len(deck[color]):
-            hand[color].append(deck[color].pop())
-        # Printouts
+        # if len(deck[color]):
+        #     hand[color].append(deck[color].pop())
+        player.draw_card()
 
         print("")
 
