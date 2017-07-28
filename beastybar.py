@@ -14,12 +14,11 @@ import random
 random.seed(123)
 
 
-######### SETTING THINGS UP #########
+# Setting things up
 table = Table()
 players = []
 players.append(Player("Blue"))
 players.append(Player("Green"))
-######### SETTING THINGS UP #########
 
 
 turn_counter = 1
