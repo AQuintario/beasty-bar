@@ -6,49 +6,40 @@ Created on Fri Jul 21 21:00:41 2017
 @author: adrian
 """
 
-import src.Game
-import src.Card
-import src.Table
+from src.instant_actions import instant_actions
+from src.Card import Card
 
 import random
 random.seed(123)
-
-class Card:
-    def __init__(self, color_, id_):
-        self.color = color_
-        self.id = id_
 
 
 ######### GAME PARAMETERS #########
 num_cards_in_hand = 4
 num_cards_in_queue = 5
-Queue = []
-Bar = []
-Alley = []
+
+
+class Table(object):
+    queue = []
+    bar = []
+    alley = []
+
+table = Table()
+
 ######### GAME PARAMETERS #########
 
-######### DEFINE TURN'S SEQUENCE #########
-# def turn(color)
-# Phase 1: choose card from hand
-# chosen_card_from_hand =
 
-
-
-
-
-
-
-######### DEFINE TURN'S SEQUENCE #########
 
 
 
 
 ######### SETTING THINGS UP #########
-
-deck_blue = ["B01", "B02", "B03", "B04", "B05", "B06",
-             "B07", "B08", "B09", "B10", "B11", "B12"]
-deck_green = ["G01", "G02", "G03", "G04", "G05", "G06",
-              "G07", "G08", "G09", "G10", "G11", "G12"]
+deck_blue = []
+deck_green = []
+for i in range(1, 13, 1):
+    color = "Blue"
+    deck_blue.append(Card(i, color))
+    color = "Green"
+    deck_green.append(Card(i, color))
 
 hand_blue = []
 hand_green = []
@@ -77,45 +68,52 @@ while len(hand_blue)+len(deck_blue) and len(hand_green)+len(deck_green):
         chosen_card_from_hand = random.choice(hand[color])  # Distant future: not random
         hand[color].remove(chosen_card_from_hand)
         # Printouts
-        print("Phase 1")
-        print("Hand:", hand[color])
-        print("Queue", Queue)
+        print("Phases 1, 2")
+        print("Hand:", hand[color], "Card chosen:", chosen_card_from_hand)
+        print("queue", table.queue)
         # End phase 1
         
-        # Phase 2: choose card from Queue
-        
-        # Phase 3: place selected card in Queue
-        Queue.append(chosen_card_from_hand)
+        # Phase 2: choose card from queue
+        chosen_target = None
+        if len(table.queue) and chosen_card_from_hand.id == 2 or chosen_card_from_hand.id == 5:
+            chosen_target = random.choice(table.queue)
+
+        # Phase 3: place selected card in queue
+        table.queue.append(chosen_card_from_hand)
         # Printouts
         print("Phase 3")
-        print("Hand:", hand[color])
-        print("Queue", Queue)
+        # print("Hand:", hand[color])
+        print("queue", table.queue)
         # End phase 3
         
-        # Phase 4: instant habilities
-        
-        # Phase 5: recurrent habilities
-        
-        # Phase 6: resolve Queue
-        if len(Queue) == 5:
-            Alley.append(Queue.pop())
-            Bar.append(Queue.pop(0))
-            Bar.append(Queue.pop(0))
+        # Phase 4: instant abilities
+        instant_actions(table, chosen_card_from_hand, chosen_target)
+        print("Phase 4")
+        print("queue", table.queue)
+
+        # Phase 5: recurrent abilities (starting for the nearest to the bar)
+        for c in table.queue[:]:  # Make a copy of the queue before shaking it
+            if c.is_recurrent and c != chosen_card_from_hand:
+                instant_actions(table, c)
+        print("Phase 5")
+        print("queue", table.queue)
+
+        # Phase 6: resolve queue
+        if len(table.queue) == 5:
+            table.alley.append(table.queue.pop())
+            table.bar.append(table.queue.pop(0))
+            table.bar.append(table.queue.pop(0))
         
         # Printouts
         print("Phase 6")
-        print("Hand:", hand[color])
-        print("Queue", Queue)
-        # End phase 6
-        
+        print("queue", table.queue)
+
         # Phase 7: draw a card from deck
         if len(deck[color]):
             hand[color].append(deck[color].pop())
         # Printouts
-        print("Phase 7")
-        print("Hand:", hand[color])
-        print("Queue", Queue)
-        # End phase 7
+
         
         print("")
 
+print("Bar:", table.bar)

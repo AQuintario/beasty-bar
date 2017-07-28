@@ -51,15 +51,16 @@ class Card(object):
         self.color = color
         self.name = self.card_names[self.id]
 
-    card_names = {1: "Skunk", 2: "Parrot", 3: "Kangaroo", 4: "Monkey",
-                  5: "Chameleon", 6: "Seal", 7: "Zebra", 8: "Jiraffe",
-                  9: "Snake", 10: "Crocodile", 11: "Hippo", 12: "Lion"}
+    card_names = {1: "Skunk", 2: "Parrot", 3: "Kangaroo", 4: "Monkey",                  5: "Chameleon", 6: "Seal", 7: "Zebra", 8: "Jiraffe",                  9: "Snake", 10: "Crocodile", 11: "Hippo", 12: "Lion"}
 
     def __eq__(self, other):
-        return self.id == other.id
+        return self.id == other.id and self.color == other.color
 
     def __gt__(self, other):
         return self.id > other.id
+
+    def __lt__(self, other):
+        return self.id < other.id
 
     def __repr__(self):
         return "%s %s (%d)" % (self.color, self.name, self.id)
@@ -185,6 +186,7 @@ print(childb.someattr)
 
 
 """Test for seal"""
+"""
 gl = Card(12, "green")
 bm = Card(4, "blue")
 gm = Card(4, "green")
@@ -194,6 +196,7 @@ lst.append(bm)
 lst.append(gl)
 lst.append(gm)
 lst.append(gs)
+lst.append(Skunk("Blue"))
 
 print(lst)
 print(lst.index(bm))
@@ -205,6 +208,40 @@ li = [5, 7, 8, 0, 2]
 print(li, "   ", li.index(0))
 li.reverse()
 print(li, "   ", li.index(0))
-
-
+print(lst)
+print(set(lst))
+"""
 """Test for seal"""
+
+
+"""Test for killing"""
+
+
+class Table(object):
+    queue = []
+    bar = []
+    alley = []
+
+table = Table()
+
+gl = Card(12, "green")
+bm = Card(4, "blue")
+gm = Card(4, "green")
+gs = Skunk("green")
+table.queue.append(bm)
+table.queue.append(gl)
+table.queue.append(gm)
+table.queue.append(gs)
+table.queue.append(Skunk("blue"))
+
+def move_from_queue_to_alley(table, cards_to_kill):
+    if not isinstance(cards_to_kill, list):
+        cards_to_kill = [cards_to_kill]
+    table.alley.extend(cards_to_kill)
+    table.queue[:] = (c for c in table.queue if c not in cards_to_kill)
+
+# print(table.queue)
+# move_from_queue_to_alley(table, bm)
+print("Q:", table.queue, "Alley:", table.alley)
+bl = Card(12, "blue")
+print(bl in table.queue)

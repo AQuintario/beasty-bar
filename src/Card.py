@@ -1,18 +1,23 @@
-import Game
+# import Game
 
-class Card(Game):
+class Card(object):
 
-    def __init__(self, id, color, recurrent  = "False"):
+    def __init__(self, id, color):
         self.id = id
         self.color = color
-        self.recurrent = recurrent
+        self.is_recurrent = False
+        if self.id == 8 or self.id == 10 or self.id == 11:
+            self.is_recurrent = True
         self.name = self.card_names[self.id]
 
     def __eq__(self, other):
-        return self.id == other.id
+        return self.id == other.id and self.color == other.color
 
     def __gt__(self, other):
         return self.id > other.id
+
+    def __lt__(self, other):
+        return self.id < other.id
 
     def __repr__(self):
         return "%s %s (%d)" % (self.color, self.name, self.id)
@@ -25,13 +30,15 @@ class Card(Game):
                   9: "Snake", 10: "Crocodile", 11: "Hippo", 12: "Lion"}
 
     def index_in_queue(self, table):
+        index = 0
         for i in table.queue:
-            if table.queue.id == self.id and table.queue.color == self.color:
-                return i
+            if i.id == self.id and i.color == self.color:
+                return index
+            index += 1
 
 class Skunk(Card):
     def __init__(self, color):
-        Card.__init__(self, id = 1, color, recurrent  = "False")
+        # Card.__init__(self, id = 1, color, recurrent  = "False")
         self.id = 1
         self.name = "Skunk"
         self.color = color
@@ -105,7 +112,7 @@ class Monkey(Card):
             table.queue[:] = (c for c in table.queue if c.id != self.id)
             sub_monkeys.reverse()
             table.queue = sub_monkeys + table.queue
-    return
+        return
 
 class Chameleon(Card):
     def __init__(self, color):
@@ -204,7 +211,7 @@ class Lion(Card):
             # Get first
             i = self.index_in_queue(table)
             while i:
-            Game.swap(table, i, i-1)
+                Game.swap(table, i, i-1)
             # Kill Monkeys
             sub_monkeys = []
             sub_monkeys[:] = (c for c in table.queue if c.id == Monkey.id)
