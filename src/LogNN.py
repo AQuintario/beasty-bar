@@ -48,12 +48,8 @@ class LogNN(object):
         return
 
     def remove_hand(self, winner_color):
-        print("Winner color:", winner_color)
         for c in self.col_map_play:
-            print("c:", c)
             if c != winner_color:
-                print(c, "is a loser")
-                print("col_map[c]:", self.col_map_play[c][0][0:20], "...")
                 for log in self.col_map_play[c]:
                     for i in self.hand_indexes:
                         del log[i]
@@ -61,6 +57,7 @@ class LogNN(object):
 
     def printout(self, winner_color):
         for color in self.col_map_play:
+            print(color)
             if color == winner_color:
                 print(" SSSSSSSSSSSSSSSSSSSSSS, PPPPPPPPPPPPPPPPPPPPPP, KKKKKKKKKKKKKKKKKKKKKK, MMMMMMMMMMMMMMMMMMMMMM, "
                       "CCCCCCCCCCCCCCCCCCCCCC, SSSSSSSSSSSSSSSSSSSSSS, ZZZZZZZZZZZZZZZZZZZZZZ, GGGGGGGGGGGGGGGGGGGGGG, "
