@@ -12,7 +12,7 @@ from src.Table import Table
 from src.LogNN import LogNN
 
 import random
-random.seed(123456)
+random.seed(123)
 
 
 # Setting things up
