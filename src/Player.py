@@ -47,7 +47,27 @@ class Player(object):
         Player.cards_all_players -= 1
         return self.chosen_card_from_hand
 
-    def choose_card_from_queue(self, table):
-        if len(table.queue) and self.chosen_card_from_hand.id == 2 or self.chosen_card_from_hand.id == 5:
-            self.chosen_target = random.choice(table.queue)
+    def choose_card_from_queue(self, table, method='Random'):
+        # Choose Parrot's target
+        if self.chosen_card_from_hand.id == 2:
+            opp_cards_in_queue = []
+            opp_cards_in_queue[:] = (c for c in table.queue if c.color != self.color)
+            if len(opp_cards_in_queue):
+                if method == 'Random':
+                    self.chosen_target = random.choice(opp_cards_in_queue)
+        # Choose Chameleon's target
+        elif self.chosen_card_from_hand.id == 5:
+            queue_ids = []
+            queue_ids[:] = (c.id for c in table.queue if c.id != 2 and c.id != 5)
+            queue_ids = list(set(queue_ids))
+            if len(queue_ids):
+                if method == 'Random':
+                    target_id = random.choice(queue_ids)
+                    self.chosen_target = Card(target_id, "")
         return self.chosen_target
+
+    def choose_cards(self, table, method='Random'):
+        self.chosen_card_from_hand = self.choose_card(method)
+        if self.chosen_card_from_hand.id == 2 or self.chosen_card_from_hand.id == 5:
+            self.chosen_target = self.choose_card_from_queue(table, method)
+        return self.chosen_card_from_hand, self.chosen_target

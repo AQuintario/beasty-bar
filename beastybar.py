@@ -12,7 +12,7 @@ from src.Table import Table
 from src.LogNN import LogNN
 
 import random
-random.seed(1234)
+random.seed(123456)
 
 
 # Setting things up
@@ -32,12 +32,9 @@ while Player.cards_all_players:
         # Read table and hands and convert to 01010100
         logNN.read_table(table, player)
 
-        # Phase 1: choose card from hand
-        chosen_card_from_hand = player.choose_card()
+        # Phases 1 and 2: choose card from hand and target card from queue
+        chosen_card_from_hand, chosen_target = player.choose_cards(table)
         print("Hand:", player.hand, "Card chosen:", chosen_card_from_hand)
-
-        # Phase 2: choose card from queue
-        chosen_target = player.choose_card_from_queue(table)
 
         # Phase 3: place selected card in queue
         table.queue.append(chosen_card_from_hand)

@@ -7,6 +7,7 @@ class LogNN(object):
     bar_offset = 5
     alley_offset = 6
     hand_offset = 7
+    number_of_choices = 34
     # class LogNN global vars
 
     def __init__(self):
@@ -71,3 +72,40 @@ class LogNN(object):
                       "SSSSSSSSSSSSSSSSSSS, CCCCCCCCCCCCCCCCCCC, HHHHHHHHHHHHHHHHHHH, LLLLLLLLLLLLLLLLLLL")
                 for i in self.col_map_play[color]:
                     print(i)
+
+    def ids_to_vector(self, id_played, id_target):
+        output_vector = [0]*LogNN.number_of_choices
+        index = 0
+        if id_played == 1:
+            index = 0
+        elif id_played == 3:
+            index = 1
+        elif id_played == 4:
+            index = 2
+        elif 6 <= id_played <= 12:
+            index = id_played - 3
+        elif id_played == 2:
+            index = 9 + id_target
+        elif id_played == 5:
+            index = 21 + id_target
+
+        output_vector[index] = 1
+        return output_vector
+
+    def vector_index_to_ids(self, index):
+        id_played, id_target = 0, 0
+        if index == 0:
+            id_played = 1
+        elif index == 1:
+            id_played = 3
+        elif index == 2:
+            id_played = 4
+        elif 3 <= index <= 9:
+            id_played = index + 3
+        elif 10 <= index <= 21:
+            id_played = 2
+            id_target = index - 9
+        elif 22 <= index <= 33:
+            id_played = 5
+            id_target = index - 21
+        return id_played, id_target

@@ -243,5 +243,9 @@ def move_from_queue_to_alley(table, cards_to_kill):
 # print(table.queue)
 # move_from_queue_to_alley(table, bm)
 print("Q:", table.queue, "Alley:", table.alley)
-bl = Card(12, "blue")
-print(bl in table.queue)
+# bl = Card(12, "blue")
+# print(bl in table.queue)
+queue_ids = []
+queue_ids[:] = (c.id for c in table.queue)
+queue_ids = list(set(queue_ids))
+print(queue_ids)
