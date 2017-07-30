@@ -18,6 +18,9 @@ class Player(object):
         self.initial_draw()
         Player.cards_all_players += len(self.deck) + len(self.hand)
 
+    def __eq__(self, other):
+        return self.color == other.color
+
     def populate_deck(self):
         for i in range(1, 13, 1):
             self.deck.append(Card(i, self.color))
