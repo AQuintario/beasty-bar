@@ -46,7 +46,7 @@ def instant_actions(table, chosen_card_from_hand, target_card=None):
     elif id == 2:
         if target_card is None:
             return
-        print("Parrot kills", target_card)
+        # print("Parrot kills", target_card)
         move_from_queue_to_alley(table, target_card)
         return
     elif id == 3:
@@ -78,7 +78,7 @@ def instant_actions(table, chosen_card_from_hand, target_card=None):
     elif id == 5:
         if target_card is None:
             return
-        print("Chameleon acts as", target_card)
+        # print("Chameleon acts as", target_card)
         # Let's try some cheap trick
         true_color = chosen_card_from_hand.color
         chosen_card_from_hand.id = target_card.id

@@ -48,6 +48,7 @@ class Player(object):
         return self.chosen_card_from_hand
 
     def choose_card_from_queue(self, table, method='Random'):
+        self.chosen_target = None
         # Choose Parrot's target
         if self.chosen_card_from_hand.id == 2:
             opp_cards_in_queue = []
@@ -68,6 +69,7 @@ class Player(object):
 
     def choose_cards(self, table, method='Random'):
         self.chosen_card_from_hand = self.choose_card(method)
+        self.chosen_target = None
         if self.chosen_card_from_hand.id == 2 or self.chosen_card_from_hand.id == 5:
             self.chosen_target = self.choose_card_from_queue(table, method)
         return self.chosen_card_from_hand, self.chosen_target
