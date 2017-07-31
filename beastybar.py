@@ -12,7 +12,7 @@ from src.Table import Table
 from src.LogNN import LogNN
 
 import random
-random.seed(123)
+random.seed(12345)
 
 
 # Setting things up
@@ -34,6 +34,7 @@ while Player.cards_all_players:
 
         # Phases 1 and 2: choose card from hand and target card from queue
         chosen_card_from_hand, chosen_target = player.choose_cards(table)
+        logNN.read_choices(chosen_card_from_hand, chosen_target)
         print("Hand:", player.hand, "Card chosen:", chosen_card_from_hand)
 
         # Phase 3: place selected card in queue
@@ -73,7 +74,8 @@ else:
     print("Blue player wins!")
     winner_color = "Blue"
 
-logNN.remove_hand(winner_color)
-logNN.printout(winner_color)
+if winner_color:
+    logNN.assemble_log(winner_color)
+    logNN.printout()
 
 
