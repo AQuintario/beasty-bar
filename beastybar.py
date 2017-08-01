@@ -6,12 +6,14 @@ Created on Fri Jul 21 21:00:41 2017
 @author: adrian
 """
 
-from src.instant_actions import instant_actions, recurrent_actions
+# from src.instant_actions import instant_actions, recurrent_actions
+from src.instant_actions import play_a_game
 from src.Player import Player
 from src.Table import Table
 from src.LogNN import LogNN
 
 from sklearn.neural_network import MLPClassifier
+import pickle
 
 
 import time
@@ -23,62 +25,38 @@ random.seed(12345)
 logNN = LogNN()
 
 verbose = False
-verboseprint = print if verbose else lambda *a, **k: None
 
-n_games = 0
+n_games = 10000
 wins = {'Blue': 0, 'Green': 0, 'Draw': 0}
 
-tic = time.clock()
-for g in range(n_games):
-    table = Table()
-    players = [Player('Blue'), Player('Green')]
-    turn_counter = 1
-    while Player.cards_all_players:
-        verboseprint("Turn", turn_counter)
-        turn_counter += 1
+try:
+    with open('ngames'+str(n_games)+'.pkl', 'rb') as input_file:
+        X = pickle.load(input_file)
+        Y = pickle.load(input_file)
+except FileNotFoundError:
+        tic = time.clock()
+        for g in range(n_games):
+            table = Table()
+            players = [Player('Blue'), Player('Green')]
+            winner_color = play_a_game(table, players, logNN)
+            wins[winner_color] += 1
 
-        for player in players:
-            # Read table and hands and convert to 01010100
-            logNN.read_table(table, player)
+        # logNN.printout()
+        X, Y = logNN.return_log()
+        with open('ngames'+str(n_games)+'.pkl', 'wb') as output_file:
+            pickle.dump(X, output_file, -1)
+            pickle.dump(Y, output_file, -1)
+        toc = time.clock()
+        print(n_games, 'games:', toc-tic, 'seconds')
+        print(wins)
 
-            # Phases 1 and 2: choose card from hand and target card from queue
-            chosen_card_from_hand, chosen_target = player.choose_cards(table)
-            logNN.read_choices(chosen_card_from_hand, chosen_target)
-            verboseprint("Hand:", player.hand, "Card chosen:", chosen_card_from_hand)
-
-            # Phase 3: place selected card in queue
-            table.queue.append(chosen_card_from_hand)
-
-            # Phase 4: instant abilities
-            instant_actions(table, chosen_card_from_hand, chosen_target)
-
-            # Phase 5: recurrent abilities (starting for the nearest to the bar)
-            recurrent_actions(table, chosen_card_from_hand)
-
-            # Phase 6: resolve queue
-            table.resolve_queue()
-            if player == players[len(players)-1]:
-                verboseprint("Phase 6")
-                verboseprint("queue", table.queue)
-                verboseprint("")
-
-            # Phase 7: draw a card from deck
-            player.draw_card()
-
-    winner_color = table.determine_winner()
-    logNN.assemble_log(winner_color)
-    wins[winner_color] += 1
-
-# logNN.printout()
-X, Y = logNN.return_log()
-toc = time.clock()
-print(n_games, 'games:', toc-tic, 'seconds')
-print(wins)
-
+hl_size = 300
 clf = MLPClassifier(solver='lbfgs', alpha=1e-5,
-                    hidden_layer_sizes=(30,), random_state=1, verbose=True)
+                    hidden_layer_sizes=(hl_size,), random_state=1, verbose=False)
 tic = time.clock()
 clf.fit(X, Y)
+with open('trained_nn_' + str(hl_size) + '_hlu' + str(n_games) + '_games.pkl', 'wb') as nn_file:
+    pickle.dump(clf, nn_file, -1)
 toc = time.clock()
 print('Fitting takes', toc-tic, 'seconds')
 
@@ -97,8 +75,10 @@ test_x = [
 [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0]
 ]
 
-print('Prediction:')
-print(clf.predict(test_x))
-print('')
-print('Prediction probabilities:')
-print(clf.predict_proba(test_x))
+# print('Prediction:')
+# for pred in clf.predict(test_x):
+#     print(logNN.vector_index_to_ids(pred.tolist().index(1)))
+# print(clf.predict(test_x))
+# print('')
+# print('Prediction probabilities:')
+# print(clf.predict_proba(test_x))

@@ -1,3 +1,5 @@
+from src.Player import Player
+
 def move_from_queue_to_alley(table, cards_to_kill):
     if not isinstance(cards_to_kill, list):
         cards_to_kill = [cards_to_kill]
@@ -31,7 +33,6 @@ def recurrent_actions(table, chosen_card_from_hand):
     for c in table.queue[:]:  # Make a copy of the queue before shaking it
         if c.is_recurrent and c != chosen_card_from_hand:
             instant_actions(table, c)
-
 
 def instant_actions(table, chosen_card_from_hand, target_card=None):
     id = chosen_card_from_hand.id
@@ -134,3 +135,44 @@ def instant_actions(table, chosen_card_from_hand, target_card=None):
             sub_monkeys[:] = (c for c in table.queue if c.id == 4)
             move_from_queue_to_alley(table, sub_monkeys)
         return
+
+verbose = False
+verboseprint = print if verbose else lambda *a, **k: None
+
+
+def play_a_turn(table, player, logNN):
+    # Read table and hands and convert to 01010100
+    logNN.read_table(table, player)
+
+    # Phases 1 and 2: choose card from hand and target card from queue
+    chosen_card_from_hand, chosen_target = player.choose_cards(table)
+    logNN.read_choices(chosen_card_from_hand, chosen_target)
+    verboseprint("Hand:", player.hand, "Card chosen:", chosen_card_from_hand)
+
+    # Phase 3: place selected card in queue
+    table.queue.append(chosen_card_from_hand)
+
+    # Phase 4: instant abilities
+    instant_actions(table, chosen_card_from_hand, chosen_target)
+
+    # Phase 5: recurrent abilities (starting for the nearest to the bar)
+    recurrent_actions(table, chosen_card_from_hand)
+
+    # Phase 6: resolve queue
+    table.resolve_queue()
+    if player.is_last():
+        verboseprint("Phase 6")
+        verboseprint("queue", table.queue)
+        verboseprint("")
+
+    # Phase 7: draw a card from deck
+    player.draw_card()
+
+
+def play_a_game(table, players, logNN):
+    while Player.cards_all_players:
+        for player in players:
+            play_a_turn(table, player, logNN)
+    winner_color = table.determine_winner()
+    logNN.assemble_log(winner_color)
+    return winner_color

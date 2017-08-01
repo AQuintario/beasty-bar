@@ -5,12 +5,15 @@ from src.Card import Card
 class Player(object):
     cards_all_players = 0
     num_cards_in_hand = 4
+    num_players = 0
 
     def __init__(self, color, is_human=False):
         self.color = color
         self.deck = []
         self.hand = []
         self.is_human = is_human
+        Player.num_players += 1
+        self.turn_pos = Player.num_players
         self.chosen_card_from_hand = None
         self.chosen_target = None
         self.populate_deck()
@@ -20,6 +23,9 @@ class Player(object):
 
     def __eq__(self, other):
         return self.color == other.color
+
+    def is_last(self):
+        return self.turn_pos == Player.num_players
 
     def populate_deck(self):
         for i in range(1, 13, 1):

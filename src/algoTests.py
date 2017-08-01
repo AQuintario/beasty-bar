@@ -249,3 +249,24 @@ queue_ids = []
 queue_ids[:] = (c.id for c in table.queue)
 queue_ids = list(set(queue_ids))
 print(queue_ids)
+
+
+class Narwhal(object):
+    def __init__(self, length_horn):
+        self.length_horn = length_horn
+        self.otherattr = []
+
+
+class Horse(object):
+    def __init__(self, n_legs):
+        self.n_legs = n_legs
+
+
+class Unicorn(Narwhal, Horse):
+    def __init__(self, length_horn, n_legs):
+        Narwhal.__init__(self, length_horn)
+        Horse.__init__(self, n_legs)
+
+uni = Unicorn(30, 4)
+
+print(uni.length_horn, uni.n_legs, uni.otherattr)
