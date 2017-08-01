@@ -25,15 +25,11 @@ logNN = LogNN()
 verbose = False
 verboseprint = print if verbose else lambda *a, **k: None
 
-n_games = 100
+n_games = 0
 wins = {'Blue': 0, 'Green': 0, 'Draw': 0}
 
-# To feed the NN - this should be prettier
-X = []
-Y = []
-
 tic = time.clock()
-for _ in range(n_games):
+for g in range(n_games):
     table = Table()
     players = [Player('Blue'), Player('Green')]
     turn_counter = 1
@@ -69,39 +65,18 @@ for _ in range(n_games):
             # Phase 7: draw a card from deck
             player.draw_card()
 
-    # Determine winner - this should be prettier
-    verboseprint("Bar:", table.bar, "\n")
-    blue_points, green_points = 0, 0
-    for c in table.bar:
-        if c.color == "Green":
-            green_points += 1
-        if c.color == "Blue":
-            blue_points += 1
-    if green_points == blue_points:
-        verboseprint("Draw")
-        winner_color = 'Draw'
-    elif green_points > blue_points:
-        verboseprint("Green player wins!")
-        winner_color = "Green"
-    else:
-        verboseprint("Blue player wins!")
-        winner_color = "Blue"
+    winner_color = table.determine_winner()
+    logNN.assemble_log(winner_color)
     wins[winner_color] += 1
 
-    if winner_color != 'Draw':
-        logNN.assemble_log(winner_color)
-        # logNN.printout()
-        x, y = logNN.return_log()
-        X.extend(x)
-        Y.extend(y)
-
+# logNN.printout()
+X, Y = logNN.return_log()
 toc = time.clock()
-
 print(n_games, 'games:', toc-tic, 'seconds')
 print(wins)
 
 clf = MLPClassifier(solver='lbfgs', alpha=1e-5,
-                    hidden_layer_sizes=(15,), random_state=1)
+                    hidden_layer_sizes=(30,), random_state=1, verbose=True)
 tic = time.clock()
 clf.fit(X, Y)
 toc = time.clock()
@@ -122,4 +97,8 @@ test_x = [
 [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0]
 ]
 
+print('Prediction:')
 print(clf.predict(test_x))
+print('')
+print('Prediction probabilities:')
+print(clf.predict_proba(test_x))

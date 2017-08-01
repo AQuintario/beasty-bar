@@ -10,16 +10,16 @@ class LogNN(object):
     hand_offset = 7
     player_offset = 8*12  # n_pos*n_cards
     number_of_choices = 36  # 10 (normal animals) + 2 (Cham & Parrot) * 13 (animals + None)
-    # class LogNN global vars
 
     def __init__(self):
-        self.inputs = []
-        self.outputs = []
-        self.inputs_dict = {'Blue': [], 'Green': []}
+        self.inputs_dict = {'Blue': [], 'Green': []}   # For a single game
         self.outputs_dict = {'Blue': [], 'Green': []}
+        # self.inputs = []  # For a single game, but only the winner
+        # self.outputs = []
+        self.X = []  # For all the games
+        self.Y = []
 
     def read_table(self, table, player):
-        # A different approach on how to read the table
         pc = player.color
         table_status = [0] * (LogNN.n_cards*(LogNN.n_pos + (LogNN.n_players - 1)*(LogNN.n_pos - 1)))
         for o in range(len(table.queue)):
@@ -47,8 +47,6 @@ class LogNN(object):
         for card in table.alley:
             i = card.id
             c = card.color
-            i = card.id
-            c = card.color
             if c == pc:
                 player_offset = 0
                 n_pos = LogNN.n_pos
@@ -72,8 +70,6 @@ class LogNN(object):
         else:
             id_target = chosen_target.id
         self.outputs_dict[pc].append(self.ids_to_vector(id_played, id_target))
-        # choice_turn = {'PlayerPlaying': pc, 'Choice': self.ids_to_vector(id_played, id_target)}
-        # self.choices_seen.append(choice_turn)
 
     def ids_to_vector(self, id_played, id_target):
         output_vector = [0]*LogNN.number_of_choices
@@ -112,13 +108,24 @@ class LogNN(object):
             id_target = index - 21
         return id_played, id_target
 
+    def reset_game_logs(self):
+        self.inputs_dict = {'Blue': [], 'Green': []}  # For a single game
+        self.outputs_dict = {'Blue': [], 'Green': []}
+        # self.inputs = []  # For a single game, but only the winner
+        # self.outputs = []
+
     def assemble_log(self, winner_color):
-        self.inputs = self.inputs_dict[winner_color]
-        self.outputs = self.outputs_dict[winner_color]
+        if winner_color != 'Draw':
+            self.X.extend(self.inputs_dict[winner_color])
+            self.Y.extend(self.outputs_dict[winner_color])
+        self.reset_game_logs()
         return
 
+    # def return_log_game(self):
+    #     return self.inputs, self.outputs
+
     def return_log(self):
-        return self.inputs, self.outputs
+        return self.X, self.Y
 
     def printout(self):
         print("  SSSSSSSSSSSSSSSSSSSSSS, PPPPPPPPPPPPPPPPPPPPPP, KKKKKKKKKKKKKKKKKKKKKK, MMMMMMMMMMMMMMMMMMMMMM, "
@@ -127,7 +134,7 @@ class LogNN(object):
               "SSSSSSSSSSSSSSSSSSS, PPPPPPPPPPPPPPPPPPP, KKKKKKKKKKKKKKKKKKK, MMMMMMMMMMMMMMMMMMM, "
               "CCCCCCCCCCCCCCCCCCC, SSSSSSSSSSSSSSSSSSS, ZZZZZZZZZZZZZZZZZZZ, GGGGGGGGGGGGGGGGGGG, "
               "SSSSSSSSSSSSSSSSSSS, CCCCCCCCCCCCCCCCCCC, HHHHHHHHHHHHHHHHHHH, LLLLLLLLLLLLLLLLLLL")
-        for i in zip(self.inputs, self.outputs):
+        for i in zip(self.X, self.Y):
             print(i)
         return
 
