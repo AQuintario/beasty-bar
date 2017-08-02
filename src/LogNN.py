@@ -109,7 +109,7 @@ class LogNN(object):
             id_target = index - 9
         elif 23 <= index <= 35:
             id_played = 5
-            id_target = index - 21
+            id_target = index - 22
         return id_played, id_target
 
     def reset_game_logs(self):

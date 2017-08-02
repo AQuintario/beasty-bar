@@ -1,0 +1,24 @@
+02/08/2017
+Training: 10000 games (didn't record how many draws), ngames10000.pkl
+Net:     clf = MLPClassifier(solver='lbfgs', alpha=1e-5,
+                        hidden_layer_sizes=(1000,), random_state=1, verbose=False)
+         trained_nn_1000_hlu_10000_games.pickle
+Eval:
+10000 games with Blue=Random, Green=Random (control):
+{'Blue': 3025, 'Green': 2564, 'Draw': 4411}
+10000 games with Blue=Random, Green=NN:
+{'Blue': 1362, 'Green': 4877, 'Draw': 3761} <====
+10000 games with Blue=NN, Green=NN:
+{'Blue': 3157, 'Green': 2701, 'Draw': 4142}
+
+Creating log of NN vs NN. (Forgot to record Draws again)
+Training Net solely on that.
+
+Bug found: when playing Chameleon, the vector - card id mapping was bugged
+so it chose an id from 2 (no Skunk) to 14 (13 is None).
+Unfortunately, this wasn't revealed in the previous test.
+So better redo the log and training.
+Even though, with the bug corrected,
+10000 games with Blue=NN, Green=Random
+{'Blue': 6008, 'Green': 917, 'Draw': 3075}
+

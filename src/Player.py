@@ -149,7 +149,7 @@ class Player(object):
             id_target = index - 9
         elif 23 <= index <= 35:
             id_played = 5
-            id_target = index - 21
+            id_target = index - 22
         return id_played, id_target
 
     def choose_cards_NN(self, table, clf):
@@ -181,7 +181,9 @@ class Player(object):
                     # I think it's ok to leave blank the color of the mimicked card
             if id_candidate_from_table == 0 or id_candidate_from_table == 13:
                 candidate_from_table = None
-            return candidate_from_hand, candidate_from_table
-
-
+            try:
+                return candidate_from_hand, candidate_from_table
+            except UnboundLocalError:
+                print(candidate_from_hand, id_candidate_from_table)
+                exit(1)
 
