@@ -145,7 +145,7 @@ def play_a_turn(table, player, logNN):
     logNN.read_table(table, player)
 
     # Phases 1 and 2: choose card from hand and target card from queue
-    chosen_card_from_hand, chosen_target = player.choose_cards(table)
+    chosen_card_from_hand, chosen_target = player.choose_cards(table, logNN.clf)
     logNN.read_choices(chosen_card_from_hand, chosen_target)
     verboseprint("Hand:", player.hand, "Card chosen:", chosen_card_from_hand)
 

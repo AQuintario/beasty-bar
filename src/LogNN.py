@@ -18,8 +18,14 @@ class LogNN(object):
         # self.outputs = []
         self.X = []  # For all the games
         self.Y = []
+        self.clf = None
 
     def read_table(self, table, player):
+        pc = player.color
+        table_status = self.get_table_status(table, player)
+        self.inputs_dict[pc].append(table_status)
+
+    def get_table_status(self, table, player):
         pc = player.color
         table_status = [0] * (LogNN.n_cards*(LogNN.n_pos + (LogNN.n_players - 1)*(LogNN.n_pos - 1)))
         for o in range(len(table.queue)):
@@ -59,8 +65,7 @@ class LogNN(object):
             i = card.id
             pos = LogNN.n_pos * (i - 1) + LogNN.hand_offset
             table_status[pos] = 1
-        self.inputs_dict[pc].append(table_status)
-        return
+        return table_status
 
     def read_choices(self, chosen_card_from_hand, chosen_target):
         pc = chosen_card_from_hand.color
@@ -86,7 +91,6 @@ class LogNN(object):
             index = 9 + id_target
         elif id_played == 5:
             index = 21 + id_target
-
         output_vector[index] = 1
         return output_vector
 
@@ -100,10 +104,10 @@ class LogNN(object):
             id_played = 4
         elif 3 <= index <= 9:
             id_played = index + 3
-        elif 10 <= index <= 21:
+        elif 10 <= index <= 22:
             id_played = 2
             id_target = index - 9
-        elif 22 <= index <= 33:
+        elif 23 <= index <= 35:
             id_played = 5
             id_target = index - 21
         return id_played, id_target
