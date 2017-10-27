@@ -22,3 +22,39 @@ Even though, with the bug corrected,
 10000 games with Blue=NN, Green=Random
 {'Blue': 6008, 'Green': 917, 'Draw': 3075}
 
+05/08/2017
+Some tests:
+
+Creating new log
+Log saved to log/ngames1000.pkl
+1000 games: 3.0763670000000003 seconds
+
+1000 games, Random vs Random
+{'Blue': 309, 'Green': 253, 'Draw': 438}
+1000 games: 345.91342800000007 seconds
+Log saved to log/ngames1000.pkl
+
+Starting fit...
+Fitting takes 584.775625 seconds
+MLPClassifier(activation='relu', alpha=1e-05, batch_size='auto', beta_1=0.9,
+       beta_2=0.999, early_stopping=False, epsilon=1e-08,
+       hidden_layer_sizes=(1000,), learning_rate='constant',
+       learning_rate_init=0.001, max_iter=200, momentum=0.9,
+       nesterovs_momentum=True, power_t=0.5, random_state=1, shuffle=True,
+       solver='lbfgs', tol=0.0001, validation_fraction=0.1, verbose=False,
+       warm_start=False)
+10000 games, NN vs Random
+{'Blue': 3632, 'Green': 2160, 'Draw': 4208}
+
+
+Starting fit...
+Fitting takes 5844.775625 seconds
+MLPClassifier(activation='relu', alpha=1e-05, batch_size='auto', beta_1=0.9,
+       beta_2=0.999, early_stopping=False, epsilon=1e-08,
+       hidden_layer_sizes=(1000,), learning_rate='constant',
+       learning_rate_init=0.001, max_iter=200, momentum=0.9,
+       nesterovs_momentum=True, power_t=0.5, random_state=1, shuffle=True,
+       solver='sgd', tol=0.0001, validation_fraction=0.1, verbose=False,
+       warm_start=False)
+10000 games, NN vs Random
+{'Blue': 5378, 'Green': 1187, 'Draw': 3435}

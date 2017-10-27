@@ -1,4 +1,6 @@
 import random
+import time
+import copy
 
 """Tests for the skunk"""
 """
@@ -218,9 +220,11 @@ print(set(lst))
 
 
 class Table(object):
-    queue = []
-    bar = []
-    alley = []
+    def __init__(self):
+        self.queue = []
+        self.bar = []
+        self.alley = []
+
 
 table = Table()
 
@@ -234,21 +238,42 @@ table.queue.append(gm)
 table.queue.append(gs)
 table.queue.append(Skunk("blue"))
 
+
+print("Q:", table.queue, "Alley:", table.alley)
+
+mock_table = copy.deepcopy(table)
+mock_table.queue.pop()
+print("MQ:", mock_table.queue, "Alley:", mock_table.alley)
+print("Q:", table.queue, "Alley:", table.alley)
+
+diff = [c for c in table.queue if c not in mock_table.queue]
+print('diff:', diff)
+
+
+
+count_blue = sum(1 for c in table.queue if c.color == 'blue')
+print('Blues:', count_blue)
+for o, c in enumerate(table.queue):
+    print(o, c.id)
+
+tic = time.strftime('%Y%m%d_%H%M')
+print(tic)
+
+# bl = Card(12, "blue")
+# print(bl in table.queue)
+queue_ids = [c.id for c in table.queue]
+queue_ids = list(set(queue_ids))
+print(queue_ids)
+
+
+
 def move_from_queue_to_alley(table, cards_to_kill):
     if not isinstance(cards_to_kill, list):
         cards_to_kill = [cards_to_kill]
     table.alley.extend(cards_to_kill)
     table.queue[:] = (c for c in table.queue if c not in cards_to_kill)
-
 # print(table.queue)
 # move_from_queue_to_alley(table, bm)
-print("Q:", table.queue, "Alley:", table.alley)
-# bl = Card(12, "blue")
-# print(bl in table.queue)
-queue_ids = []
-queue_ids[:] = (c.id for c in table.queue)
-queue_ids = list(set(queue_ids))
-print(queue_ids)
 
 
 class Narwhal(object):

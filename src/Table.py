@@ -14,13 +14,8 @@ class Table(object):
             self.bar.append(self.queue.pop(0))
 
     def determine_winner(self):
-        blue_points, green_points = 0, 0
-
-        for c in self.bar:
-            if c.color == "Green":
-                green_points += 1
-            if c.color == "Blue":
-                blue_points += 1
+        blue_points = sum(1 for c in self.bar if c.color == 'Blue')
+        green_points = sum(1 for c in self.bar if c.color == 'Green')
         if green_points == blue_points:
             winner_color = 'Draw'
         elif green_points > blue_points:

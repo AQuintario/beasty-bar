@@ -9,16 +9,22 @@ class Player(object):
     num_cards_in_hand = 4
     num_players = 0
 
-    def __init__(self, color, method='Random', is_human=False):
+    def __init__(self, color, method='Random', clf=None, is_human=False):
         self.color = color
+        self.method = method
+        if self.method == 'NN':
+            self.clf = clf
+        self.is_human = is_human
         self.deck = []
         self.hand = []
-        self.method = method
-        self.is_human = is_human
         Player.num_players += 1
         self.turn_pos = Player.num_players
         self.chosen_card_from_hand = None
         self.chosen_target = None
+
+    def reset(self):
+        self.deck = []
+        self.hand = []
         self.populate_deck()
         self.shuffle_deck()
         self.initial_draw()
@@ -75,9 +81,9 @@ class Player(object):
                 self.chosen_target = Card(target_id, "")
         return self.chosen_target
 
-    def choose_cards(self, table, clf=None):
+    def choose_cards(self, table):
         if self.method == 'NN':
-            self.chosen_card_from_hand, self.chosen_target = self.choose_cards_NN(table, clf)
+            self.chosen_card_from_hand, self.chosen_target = self.choose_cards_NN(table)
         elif self.method == 'Random':
             self.chosen_card_from_hand = self.choose_card_random()
             self.chosen_target = None
@@ -89,37 +95,22 @@ class Player(object):
     def read_table(self, table):
         pc = self.color
         table_status = [0] * (LogNN.n_cards*(LogNN.n_pos + (LogNN.n_players - 1)*(LogNN.n_pos - 1)))
-        for o in range(len(table.queue)):
-            i = table.queue[o].id
-            c = table.queue[o].color
-            if c == pc:
-                player_offset = 0
-                n_pos = LogNN.n_pos
-            else:
-                player_offset = LogNN.player_offset
-                n_pos = LogNN.n_pos - 1
+        for o, card in enumerate(table.queue):
+            i = card.id
+            c = card.color
+            player_offset, n_pos = (0, LogNN.n_pos) if c == pc else (LogNN.player_offset, LogNN.n_pos-1)
             pos = n_pos * (i - 1) + player_offset + LogNN.queue_offset + o
             table_status[pos] = 1
         for card in table.bar:
             i = card.id
             c = card.color
-            if c == pc:
-                player_offset = 0
-                n_pos = LogNN.n_pos
-            else:
-                player_offset = LogNN.player_offset
-                n_pos = LogNN.n_pos - 1
+            player_offset, n_pos = (0, LogNN.n_pos) if c == pc else (LogNN.player_offset, LogNN.n_pos-1)
             pos = n_pos * (i - 1) + player_offset + LogNN.bar_offset
             table_status[pos] = 1
         for card in table.alley:
             i = card.id
             c = card.color
-            if c == pc:
-                player_offset = 0
-                n_pos = LogNN.n_pos
-            else:
-                player_offset = LogNN.player_offset
-                n_pos = LogNN.n_pos - 1
+            player_offset, n_pos = (0, LogNN.n_pos) if c == pc else (LogNN.player_offset, LogNN.n_pos-1)
             pos = n_pos * (i - 1) + player_offset + LogNN.alley_offset
             table_status[pos] = 1
         for card in self.hand:
@@ -128,11 +119,12 @@ class Player(object):
             table_status[pos] = 1
         return table_status
 
-    def get_log_prob_pred(self, table, clf):
-        table_status = self.read_table(table)
+    def get_log_prob_pred(self, table):
+        # table_status = self.read_table(table)
+        table_status = LogNN.get_table_status(table, self)
         table_status = numpy.array(table_status)
         table_status = table_status.reshape(1, -1)
-        return clf.predict_log_proba(table_status)[0]
+        return self.clf.predict_log_proba(table_status)[0]
 
     def vector_index_to_ids(self, index):
         id_played, id_target = 0, 0
@@ -152,8 +144,8 @@ class Player(object):
             id_target = index - 22
         return id_played, id_target
 
-    def choose_cards_NN(self, table, clf):
-        probs = self.get_log_prob_pred(table, clf)
+    def choose_cards_NN(self, table):
+        probs = self.get_log_prob_pred(table)
         sort_index = numpy.argsort(probs)
         sort_index = sort_index.tolist()
         sort_index.reverse()

@@ -1,5 +1,6 @@
 from src.Player import Player
 
+
 def move_from_queue_to_alley(table, cards_to_kill):
     if not isinstance(cards_to_kill, list):
         cards_to_kill = [cards_to_kill]
@@ -34,14 +35,13 @@ def recurrent_actions(table, chosen_card_from_hand):
         if c.is_recurrent and c != chosen_card_from_hand:
             instant_actions(table, c)
 
+
 def instant_actions(table, chosen_card_from_hand, target_card=None):
     id = chosen_card_from_hand.id
     if id == 1:
-        queue_ids = []
-        queue_ids[:] = (c.id for c in table.queue)
+        queue_ids = [c.id for c in table.queue]
         ids_to_kill = get_n_highest_except_self(queue_ids, 2, 1)
-        cards_to_kill = []
-        cards_to_kill[:] = (c for c in table.queue if c.id in ids_to_kill)
+        cards_to_kill = [c for c in table.queue if c.id in ids_to_kill]
         move_from_queue_to_alley(table, cards_to_kill)
         return
     elif id == 2:
@@ -58,20 +58,16 @@ def instant_actions(table, chosen_card_from_hand, target_card=None):
                 i = chosen_card_from_hand.index_in_queue(table)
         return
     elif id == 4:
-        queue_ids = []
-        queue_ids[:] = (c.id for c in table.queue)
+        queue_ids = [c.id for c in table.queue]
         n_monkeys = queue_ids.count(4)
         if n_monkeys > 1:
             # Kill hippos and crocs
-            hippos = []
-            hippos[:] = (c for c in table.queue if c.id == 11)
-            crocs = []
-            crocs[:] = (c for c in table.queue if c.id == 10)
+            hippos = [c for c in table.queue if c.id == 11]
+            crocs = [c for c in table.queue if c.id == 10]
             move_from_queue_to_alley(table, hippos)
             move_from_queue_to_alley(table, crocs)
             # Move to the front
-            sub_monkeys = []
-            sub_monkeys[:] = (c for c in table.queue if c.id == 4)
+            sub_monkeys = [c for c in table.queue if c.id == 4]
             table.queue[:] = (c for c in table.queue if c.id != 4)
             sub_monkeys.reverse()
             table.queue = sub_monkeys + table.queue
@@ -122,8 +118,7 @@ def instant_actions(table, chosen_card_from_hand, target_card=None):
             id_in_front = table.queue[i - 1].id
         return
     elif id == 12:
-        queue_ids = []
-        queue_ids[:] = (c.id for c in table.queue)
+        queue_ids = [c.id for c in table.queue]
         if queue_ids.count(12) > 1:
             move_last_in_queue_to_alley(table)
             return
@@ -131,8 +126,7 @@ def instant_actions(table, chosen_card_from_hand, target_card=None):
             # Get first
             table.queue.insert(0, table.queue.pop())
             # Kill Monkeys
-            sub_monkeys = []
-            sub_monkeys[:] = (c for c in table.queue if c.id == 4)
+            sub_monkeys = [c for c in table.queue if c.id == 4]
             move_from_queue_to_alley(table, sub_monkeys)
         return
 
@@ -145,7 +139,7 @@ def play_a_turn(table, player, logNN):
     logNN.read_table(table, player)
 
     # Phases 1 and 2: choose card from hand and target card from queue
-    chosen_card_from_hand, chosen_target = player.choose_cards(table, logNN.clf)
+    chosen_card_from_hand, chosen_target = player.choose_cards(table)
     logNN.read_choices(chosen_card_from_hand, chosen_target)
     verboseprint("Hand:", player.hand, "Card chosen:", chosen_card_from_hand)
 
@@ -161,7 +155,6 @@ def play_a_turn(table, player, logNN):
     # Phase 6: resolve queue
     table.resolve_queue()
     if player.is_last():
-        verboseprint("Phase 6")
         verboseprint("queue", table.queue)
         verboseprint("")
 
@@ -170,9 +163,11 @@ def play_a_turn(table, player, logNN):
 
 
 def play_a_game(table, players, logNN):
+    for player in players:
+        player.reset()
     while Player.cards_all_players:
         for player in players:
             play_a_turn(table, player, logNN)
     winner_color = table.determine_winner()
-    logNN.assemble_log(winner_color)
+    logNN.assemble_log(winner_color, table)
     return winner_color
